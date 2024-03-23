@@ -1,0 +1,20 @@
+# 忽略target文件夹
+target/
+
+# 忽略IDE生成的文件和目录
+.idea/
+.classpath
+.project
+.metadata
+*.log
+*.iml
+
+# 忽略生成的jar和war
+*.jar
+*.war
+
+# 忽略Mac OS中的DS_Store文件
+.DS_Store
+
+# 忽略.vscode目录（如果使用VS Code作为IDE）
+.vscode/

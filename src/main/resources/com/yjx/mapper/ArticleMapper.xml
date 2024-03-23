@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yjx.mapper.ArticleMapper">
+    <!--条件查询,根据标题、发布者、发布时间、鉴定级别、爬取网站-->
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from article
+        <where>
+            is_deleted=0
+            <if test="title!=null and title!=''">
+                and title like concat('%',#{title},'%')
+            </if>
+            <if test="publisher!=null and publisher!=''">
+                and publisher like concat('%',#{publisher},'%')
+            </if>
+            <if test="verificationLevel!=null">
+                and verification_level=#{verificationLevel}
+            </if>
+            <if test="crawlSource!=null">
+                and crawl_source=#{crawlSource}
+            </if>
+            <if test="begin!=null and end!=null">
+                and publish_time between #{begin} and #{end}
+            </if>
+            <if test="status!=null">
+                and status =#{status}
+            </if>
+            <if test="status!=null">
+                and status =#{status}
+            </if>
+        </where>
+    </select>
+    <select id="page" resultType="com.yjx.pojo.Article">
+        select id,title,publisher,publish_time,crawl_source,verification_level,crawl_url,status
+        from article
+        <where>
+            is_deleted=0
+            <if test="title!=null and title!=''">
+                and title like concat('%',#{title},'%')
+            </if>
+            <if test="publisher!=null and publisher!=''">
+                and publisher like concat('%',#{publisher},'%')
+            </if>
+            <if test="verificationLevel!=null">
+                and verification_level=#{verificationLevel}
+            </if>
+            <if test="crawlSource!=null">
+                and crawl_source=#{crawlSource}
+            </if>
+            <if test="status!=null">
+                and status=#{status}
+            </if>
+            <if test="begin!=null and end!=null">
+                and publish_time between #{begin} and #{end}
+            </if>
+            <if test="status!=null">
+                and status =#{status}
+            </if>
+        </where>
+        order by publish_time desc
+        limit #{start},#{pageSize}
+    </select>
+
+    <!--根据ids批量删除-->
+    <update id="deleteByIds">
+        update article set is_deleted = 1 where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--更新,只能修改标题、发布状态-->
+    <update id="update">
+        update article
+        <set>
+            <if test="title!=null and articlename!=''">
+                title = #{title},
+            </if>
+            <if test="status!=null">
+                status = #{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

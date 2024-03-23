@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yjx.mapper.TagMapper">
+
+    <!--新增不重复的标签-->
+    <insert id="insertIfNotExists" parameterType="String">
+        <if test="tagName != null and tagName != ''">
+            INSERT INTO tag (tag_name)
+            SELECT #{tagName}
+            WHERE NOT EXISTS (
+            SELECT 1 FROM tag
+            WHERE tag_name = #{tagName}
+            );
+        </if>
+    </insert>
+    <!--新增不重复的关系中间表-->
+    <insert id="insertTagRelation">
+        INSERT INTO tag_relation (article_id, tag_id)
+        SELECT #{articleId}, #{tagId}
+        FROM dual
+        WHERE NOT EXISTS(
+                SELECT 1
+                FROM tag_relation
+                WHERE article_id = #{articleId}
+                  AND tag_id = #{tagId}
+            );
+    </insert>
+
+    <!-- 根据文章ID查询文章标签 -->
+    <select id="getTagsByArticleId" resultType="com.yjx.pojo.Tag">
+        SELECT t.tag_name
+        FROM tag t
+                 JOIN tag_relation tr ON t.id = tr.tag_id
+                 JOIN article a ON tr.article_id = a.id
+        WHERE a.id = #{articleId}
+    </select>
+
+
+    <!--根据文章ids批量删除标签-->
+    <delete id="deleteAllTagByArticleIds">
+        delete from tag_relation where article_id in
+        <foreach collection="articleIds" item="articleId" separator="," open="(" close=")">
+            #{articleId}
+        </foreach>
+    </delete>
+
+    <!-- 根据标签ID查询带有该标签的文章 -->
+    <select id="getArticleByTagId" resultType="com.yjx.pojo.Article">
+        SELECT article.*
+        FROM article
+                 JOIN tag_relation ON article.id = tag_relation.article_id
+        WHERE tag_relation.tag_id = #{tagId};
+    </select>
+
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yjx.mapper.QuestionMapper">
+
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from question
+        <where>
+            <if test="questionText!=null and questionText!=''">
+                question_text like concat('%',#{questionText},'%')
+            </if>
+            <if test="answer!=null">
+                and answer like concat ('%',#{answer},'%')
+            </if>
+            <if test="answerSource!=null and answerSource!=''">
+                answer_source like concat('%',#{answerSource},'%')
+            </if>
+        </where>
+    </select>
+    <select id="page" resultType="com.yjx.pojo.Question">
+        select *
+        from question
+        <where>
+            <if test="questionText!=null and questionText!=''">
+                question_text like concat('%',#{questionText},'%')
+            </if>
+            <if test="answer!=null">
+                and answer like concat ('%',#{answer},'%')
+            </if>
+            <if test="answerSource!=null and answerSource!=''">
+                answer_source like concat('%',#{answerSource},'%')
+            </if>
+        </where>
+        order by id desc
+        limit #{start},#{pageSize}
+    </select>
+    <!--根据ids批量删除-->
+    <delete id="deleteByIds">
+        delete from question where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRecordByIds">
+        delete from question_record where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--更新-->
+    <update id="update">
+        update question
+        <set>
+            <if test="questionText!=null and questionText!=''">
+                question_text = #{questionText},
+            </if>
+            <if test="answer!=null">
+                answer = #{answer},
+            </if>
+            <if test="answerSource!=null and answerSource!=''">
+                answer_source = #{answerSource},
+            </if>
+            <if test="cover!=null and cover!=''">
+                cover = #{cover},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

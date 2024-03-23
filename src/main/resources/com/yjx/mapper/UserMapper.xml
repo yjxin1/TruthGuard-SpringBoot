@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yjx.mapper.UserMapper">
+    <!--条件查询,根据昵称、类型、电话号-->
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from user
+        <where>
+            <if test="nick!=null and nick!=''">
+                nick like concat('%',#{nick},'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone like concat ('%',#{phone},'%')
+            </if>
+            <if test="type!=null">
+                and type = #{type}
+            </if>
+        </where>
+    </select>
+    <select id="page" resultType="com.yjx.pojo.User">
+        select *
+        from user
+        <where>
+            <if test="nick!=null and nick!=''">
+                nick like concat('%',#{nick},'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone like concat ('%',#{phone},'%')
+            </if>
+            <if test="type!=null">
+                and type = #{type}
+            </if>
+        </where>
+        limit #{start},#{pageSize}
+    </select>
+
+    <!--根据ids批量删除-->
+    <delete id="deleteByIds">
+        delete from user where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--更新-->
+    <update id="update">
+        update user
+        <set>
+            <if test="nick!=null and nick!=''">
+                nick = #{nick},
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone = #{phone},
+            </if>
+            <if test="password!=null and password!=''">
+                password = #{password},
+            </if>
+            <if test="gender!=null">
+                gender = #{gender},
+            </if>
+            <if test="age!=null">
+                age = #{age},
+            </if>
+            <if test="type!=null">
+                type = #{type},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

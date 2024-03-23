@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yjx.mapper.ClueMapper">
+    <!--条件查询,根据标题、手机号、类别、发布时间-->
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from clue
+        <where>
+            <if test="title!=null and title!=''">
+                title like concat('%',#{title},'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone like concat('%',#{phone},'%')
+            </if>
+            <if test="field!=null and field!=''">
+                and field=#{field}
+            </if>
+            <if test="begin!=null and end!=null">
+                and submit_time between #{begin} and #{end}
+            </if>
+        </where>
+    </select>
+    <select id="page" resultType="com.yjx.pojo.Clue">
+        select id,title,content,link,submit_time,phone,field
+        from clue
+        <where>
+            <if test="title!=null and title!=''">
+                title like concat('%',#{title},'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone like concat('%',#{phone},'%')
+            </if>
+            <if test="field!=null and field!=''">
+                and field=#{field}
+            </if>
+            <if test="begin!=null and end!=null">
+                and submit_time between #{begin} and #{end}
+            </if>
+        </where>
+        order by submit_time desc
+        limit #{start},#{pageSize}
+    </select>
+
+    <!--根据ids批量删除-->
+    <delete id="deleteByIds">
+        delete from clue where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--更新线索-->
+    <update id="update">
+        update clue
+        <set>
+            <if test="title!=null and title!=''">
+                title = #{title},
+            </if>
+            <if test="link!=null and link!=''">
+                link = #{link},
+            </if>
+            <if test="content!=null and content!=''">
+                content = #{content},
+            </if>
+            <if test="submitTime!=null">
+                submit_time = #{submitTime},
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone = #{phone},
+            </if>
+            <if test="field!=null and field!=''">
+                field = #{field},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
